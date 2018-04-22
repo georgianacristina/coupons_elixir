@@ -2,7 +2,6 @@ defmodule Coupons do
 
 
   use Application
-  import Meeseeks.CSS
 
 
   def init(default_options) do
@@ -18,6 +17,8 @@ defmodule Coupons do
   end
 
   def start(_type, _args) do
+     import Supervisor.Spec, warn: false
+
       children = [
         Plug.Adapters.Cowboy.child_spec(:http, Web.Router, [], [port: 4001]),
         supervisor(Coupons.Repo, [])
@@ -25,14 +26,6 @@ defmodule Coupons do
       opts = [ strategy: :one_for_one, name: Coupons.Supervisor ]
       Supervisor.start_link(children, opts)
     end
-
-#def start(_type, _args) do
-#  import Supervisor.Spec
-#
-#  children = [
-#    Coupons.Repo,
-#  ]
-#end
 
 
 end
