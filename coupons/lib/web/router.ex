@@ -15,6 +15,11 @@ defmodule Web.Router do
     send_resp(conn, 200, "I love <3 Elixir")
   end
 
+  get "/coupons" do
+    [controller] = ["page"]
+    CouponsList.Page.render(conn, controller)
+  end
+
   match _ do
     send_resp(conn, 404, "This is not the page you're looking for.")
   end
