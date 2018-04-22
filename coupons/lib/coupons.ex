@@ -9,4 +9,14 @@ defmodule Coupons do
      conn
      |> Plug.Conn.send_resp(200, "hello world")
   end
+
+
+def start(_type, _args) do
+  import Supervisor.Spec
+
+  children = [
+    Coupons.Repo,
+  ]
+end
+
 end

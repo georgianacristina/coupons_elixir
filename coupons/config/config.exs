@@ -2,6 +2,14 @@
 # and its dependencies with the aid of the Mix.Config module.
 use Mix.Config
 
+config :coupons, Elixir.Coupons.Repo,
+  adapter: Ecto.Adapters.Postgres,
+  database: "coupons_repo",
+  username: "cristinaoana",
+  password: "postgres",
+  hostname: "localhost"
+config :coupons, ecto_repos: [Coupons.Repo]
+
 # This configuration is loaded before any dependency and is restricted
 # to this project. If another project depends on this project, this
 # file won't be loaded nor affect the parent project. For this reason,
