@@ -28,7 +28,8 @@ defmodule Coupons.MixProject do
       {:ecto, "~> 2.0"},
    {:postgrex, "~> 0.11"},
 	{:cowboy, "~> 1.0.3"},
-	{:plug, "~> 1.0"}
+	{:plug, "~> 1.0"},
+  {:floki, "~> 0.20.0"}
     ]
   end
 end
