@@ -1,4 +1,6 @@
 defmodule Coupons do
+
+	use Application
   def init(default_options) do
      IO.puts "initializing plug"
      default_options   
@@ -12,11 +14,13 @@ defmodule Coupons do
 
 
 def start(_type, _args) do
-  import Supervisor.Spec
+  import Supervisor.Spec, warn: false
 
   children = [
-    Coupons.Repo,
-  ]
+    supervisor(Coupons.Repo, [])  ]
+
+  opts = [ strategy: :one_for_one, name: Coupons.Supervisor ]
+   Supervisor.start_link( children, opts )
 end
 
 end
