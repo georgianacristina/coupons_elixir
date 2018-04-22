@@ -11,9 +11,7 @@ defmodule Coupons do
 
   def call(conn, options) do
      IO.puts "calling plug"
-     conn
-     |> Plug.Conn.put_resp_header("content-type", "text/html; charset=utf-8")
-     |> Plug.Conn.send_file(200, "lib/web/couponsMain.html")
+     Web.Router.call(conn, Web.Router.init([]))
   end
 
   def start(_type, _args) do
