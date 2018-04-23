@@ -32,8 +32,14 @@ defmodule CouponsList.Page do
     import Plug.Conn
 
     def render(conn, controller) do
-      conn = assign(conn, :current_user, conn.assigns.current_user)
-      user_id =  conn.assigns.current_user.id
+      path_info = conn.path_info
+        if conn.assigns != %{} do
+        conn = assign(conn, :current_user, conn.assigns.current_user)
+        user_id =  conn.assigns.current_user.id
+      else
+        user_id = 0
+      end
+      
         header_html = "
         <!DOCTYPE html>
         <html>
@@ -125,6 +131,7 @@ end
 
 defmodule CouponInsert.Page do
     import Plug.Conn
+    require Ecto.Query
 
     def parse(conn, opts \\ []) do
 	    opts = Keyword.put_new(opts, :parsers, [Plug.Parsers.URLENCODED, Plug.Parsers.MULTIPART])
@@ -133,19 +140,31 @@ defmodule CouponInsert.Page do
 
     def render(conn, controller) do
 
-      IO.puts conn.assigns.current_user.id
        	conn = parse(conn)
 		name = conn.params["name"]
 		description = conn.params["description"]
 		photo = conn.params["photo"]
-		# IO.puts conn
-		# receiverId = conn.params[""]
-		# coupon = %Coupons.UserCoupon{name: name, description: description, photo: photo, receiver_id: iddd, giver_id: iddd}
-		# case Coupons.Repo.insert(coupon) do
-		#   {:ok, coupon}       -> 
-		#   	send_resp(conn, 200, "Succesfully inserted.")
-		#   {:error, user} ->
-		#   	send_resp(conn, 200, "Something went wrong.")
-		# end
+
+    {coupon_id, _} = :string.to_integer(to_char_list(conn.params["coupon_id"]))
+    {giver_id, _} = :string.to_integer(to_char_list(conn.params["giver_id"]))
+    {user_id, _} = :string.to_integer(to_char_list(conn.params["user_id"]))
+
+		coupon = %Coupons.UserCoupon{name: name, description: description, photo: photo, giver_id: user_id}
+		case Coupons.Repo.insert(coupon) do
+		  {:ok, coupon}       -> 
+
+        couponUpdate = Ecto.Query.from(p in Coupons.UserCoupon, where: p.id == ^coupon_id) |> Coupons.Repo.one
+        {myInt, _} = :string.to_integer(to_char_list("23"))
+		  	changeset = Coupons.UserCoupon.changeset(couponUpdate, %{receiver_id: user_id})
+        case Coupons.Repo.update(changeset) do
+          {:ok, couponUpdate}       -> 
+            [controller] = ["coupons"]
+            CouponsList.Page.render(conn, controller)
+          {:error, couponUpdate} ->
+            send_resp(conn, 200, "Something went wrong.")
+        end
+		  {:error, coupon} ->
+		  	send_resp(conn, 200, "Something went wrong.")
+		end
     end
 end
