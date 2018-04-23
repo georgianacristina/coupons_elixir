@@ -27,10 +27,21 @@ defmodule Web.Router do
      |> Plug.Conn.send_file(200, "lib/web/register.html")
 	end
 
+	get "/addcoupon/:giver_id" do
+	  conn
+     |> Plug.Conn.put_resp_header("content-type", "text/html; charset=utf-8")
+     |> Plug.Conn.send_file(200, "lib/web/add_coupon.html")
+	end
+
 
 	get "/coupons" do
 	    [controller] = ["page"]
 	    CouponsList.Page.render(conn, controller)
+	end
+
+	post "/addcoupon" do
+	    [controller] = ["page"]
+	    CouponInsert.Page.render(conn, controller)
 	end
 
 	post "/login" do

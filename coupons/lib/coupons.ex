@@ -48,7 +48,9 @@ defmodule CouponsList.Page do
         x = for n <- Coupons.UserCoupon |> Coupons.Repo.all, do:
         "</br><strong>ID:</strong> " <> Kernel.inspect(n.id) <>
         "</br><strong>Name:</strong> " <> Kernel.inspect(n.name) <>
-        "</br><strong>Description:</strong> " <> Kernel.inspect(n.description) <> "<hr>"
+        "</br><strong>Description:</strong> " <> Kernel.inspect(n.description) <> 
+        "</br><button onclick=\"window.location.href='/addcoupon/" <>  Kernel.inspect(n.giver_id) <> "'\">Get this coupon</button>" <> "<hr>"
+        
         html = Enum.join([header_html, x], " ")
         html = Enum.join([html, footer_html], " ")
         conn
@@ -69,10 +71,19 @@ defmodule Login.Page do
     def render(conn, controller) do
        	conn = parse(conn)
 		email = conn.params["email"]
-		password = conn.params["password"]
+		password = conn.params["password"] 
 		user = Ecto.Query.from(p in Coupons.User, where: p.email == ^email,  where: p.password == ^password) |> Coupons.Repo.one
 		if !!user do
-			# send to /coupons
+
+		[controller] = ["coupons"]
+	    CouponsList.Page.render(conn, controller)
+		
+
+			# conn = %{conn | path_info: ["coupons"]}
+			# send_resp(conn, 200, "")
+
+			    # Invoke the plug
+			    # conn = Web.Router.call(conn, Web.Router.init([]))
 		else
 			send_resp(conn, 200, "#{email} doesn't exist.")
 		end
@@ -100,5 +111,30 @@ defmodule Register.Page do
 		  {:error, user} ->
 		  	send_resp(conn, 200, "Something went wrong.")
 		end
+    end
+end
+
+defmodule CouponInsert.Page do
+    import Plug.Conn
+
+    def parse(conn, opts \\ []) do
+	    opts = Keyword.put_new(opts, :parsers, [Plug.Parsers.URLENCODED, Plug.Parsers.MULTIPART])
+	    Plug.Parsers.call(conn, Plug.Parsers.init(opts))
+	end
+
+    def render(conn, controller) do
+       	conn = parse(conn)
+		name = conn.params["name"]
+		description = conn.params["description"]
+		photo = conn.params["photo"]
+		# IO.puts conn
+		# receiverId = conn.params[""]
+		# coupon = %Coupons.UserCoupon{name: name, description: description, photo: photo, receiver_id: iddd, giver_id: iddd}
+		# case Coupons.Repo.insert(coupon) do
+		#   {:ok, coupon}       -> 
+		#   	send_resp(conn, 200, "Succesfully inserted.")
+		#   {:error, user} ->
+		#   	send_resp(conn, 200, "Something went wrong.")
+		# end
     end
 end
