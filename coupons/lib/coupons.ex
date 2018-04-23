@@ -1,8 +1,6 @@
 defmodule Coupons do
 
-
   use Application
-
 
   def init(default_options) do
      IO.puts "initializing plug"
@@ -12,13 +10,16 @@ defmodule Coupons do
   def call(conn, options) do
      IO.puts "calling plug"
      Web.Router.call(conn, Web.Router.init([]))
+     conn
+     |> Plug.Conn.put_resp_header("content-type", "text/html; charset=utf-8")
+     |> Plug.Conn.send_file(200, "lib/web/couponsMain.html")
   end
 
   def start(_type, _args) do
      import Supervisor.Spec, warn: false
 
       children = [
-        Plug.Adapters.Cowboy.child_spec(:http, Web.Router, [], [port: 4001]),
+        Plug.Adapters.Cowboy.child_spec(:http, Web.Router, [], [port: 4002]),
         supervisor(Coupons.Repo, [])
       ]
       opts = [ strategy: :one_for_one, name: Coupons.Supervisor ]
@@ -106,7 +107,7 @@ defmodule Register.Page do
 		lastName = conn.params["last_name"]
 		user = %Coupons.User{email: email, password: password, first_name: firstName, last_name: lastName}
 		case Coupons.Repo.insert(user) do
-		  {:ok, user}       -> 
+		  {:ok, user}       ->
 		  	send_resp(conn, 200, "Succesfully inserted.")
 		  {:error, user} ->
 		  	send_resp(conn, 200, "Something went wrong.")
@@ -120,7 +121,7 @@ defmodule CouponInsert.Page do
     def parse(conn, opts \\ []) do
 	    opts = Keyword.put_new(opts, :parsers, [Plug.Parsers.URLENCODED, Plug.Parsers.MULTIPART])
 	    Plug.Parsers.call(conn, Plug.Parsers.init(opts))
-	end
+	  end
 
     def render(conn, controller) do
        	conn = parse(conn)
