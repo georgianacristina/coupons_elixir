@@ -56,3 +56,49 @@ defmodule CouponsList.Page do
         |> send_resp(200,  html)
     end
 end
+
+defmodule Login.Page do
+    import Plug.Conn
+     require Ecto.Query
+
+    def parse(conn, opts \\ []) do
+	    opts = Keyword.put_new(opts, :parsers, [Plug.Parsers.URLENCODED, Plug.Parsers.MULTIPART])
+	    Plug.Parsers.call(conn, Plug.Parsers.init(opts))
+	end
+
+    def render(conn, controller) do
+       	conn = parse(conn)
+		email = conn.params["email"]
+		password = conn.params["password"]
+		user = Ecto.Query.from(p in Coupons.User, where: p.email == ^email,  where: p.password == ^password) |> Coupons.Repo.one
+		if !!user do
+			# send to /coupons
+		else
+			send_resp(conn, 200, "#{email} doesn't exist.")
+		end
+    end
+end
+
+defmodule Register.Page do
+    import Plug.Conn
+
+    def parse(conn, opts \\ []) do
+	    opts = Keyword.put_new(opts, :parsers, [Plug.Parsers.URLENCODED, Plug.Parsers.MULTIPART])
+	    Plug.Parsers.call(conn, Plug.Parsers.init(opts))
+	end
+
+    def render(conn, controller) do
+       	conn = parse(conn)
+		email = conn.params["email"]
+		password = conn.params["password"]
+		firstName = conn.params["first_name"]
+		lastName = conn.params["last_name"]
+		user = %Coupons.User{email: email, password: password, first_name: firstName, last_name: lastName}
+		case Coupons.Repo.insert(user) do
+		  {:ok, user}       -> 
+		  	send_resp(conn, 200, "Succesfully inserted.")
+		  {:error, user} ->
+		  	send_resp(conn, 200, "Something went wrong.")
+		end
+    end
+end

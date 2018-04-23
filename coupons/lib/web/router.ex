@@ -4,6 +4,10 @@ defmodule Web.Router do
   plug :match
   plug :dispatch
 
+	def parse(conn, opts \\ []) do
+	    opts = Keyword.put_new(opts, :parsers, [Plug.Parsers.URLENCODED, Plug.Parsers.MULTIPART])
+	    Plug.Parsers.call(conn, Plug.Parsers.init(opts))
+	end
 
 	get "/" do
 	  conn
@@ -11,17 +15,37 @@ defmodule Web.Router do
      |> Plug.Conn.send_file(200, "lib/web/couponsMain.html")
 	end
 
-  get "/elixir" do
-    send_resp(conn, 200, "I love <3 Elixir")
-  end
+	get "/login" do
+	  conn
+     |> Plug.Conn.put_resp_header("content-type", "text/html; charset=utf-8")
+     |> Plug.Conn.send_file(200, "lib/web/login.html")
+	end
 
-  get "/coupons" do
-    [controller] = ["page"]
-    CouponsList.Page.render(conn, controller)
-  end
+	get "/register" do
+	  conn
+     |> Plug.Conn.put_resp_header("content-type", "text/html; charset=utf-8")
+     |> Plug.Conn.send_file(200, "lib/web/register.html")
+	end
 
-  match _ do
-    send_resp(conn, 404, "This is not the page you're looking for.")
-  end
+
+	get "/coupons" do
+	    [controller] = ["page"]
+	    CouponsList.Page.render(conn, controller)
+	end
+
+	post "/login" do
+		[controller] = ["page"]
+	    Login.Page.render(conn, controller)
+	end
+
+	post "/register" do
+		[controller] = ["page"]
+	    Register.Page.render(conn, controller)
+	end
+
+	match _ do
+		send_resp(conn, 404, "This is not the page you're looking for.")
+	end
+
 
 end
