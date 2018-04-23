@@ -27,7 +27,7 @@ defmodule Web.Router do
      |> Plug.Conn.send_file(200, "lib/web/register.html")
 	end
 
-	get "/addcoupon/:giver_id" do
+	get "/addcoupon" do
 	  conn
      |> Plug.Conn.put_resp_header("content-type", "text/html; charset=utf-8")
      |> Plug.Conn.send_file(200, "lib/web/add_coupon.html")

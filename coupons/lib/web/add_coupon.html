@@ -1,6 +1,36 @@
 <!DOCTYPE html>
 <html>
+
 <body>
+
+<script type="text/javascript">
+function GetURLParameter(sParam)
+{
+    var sPageURL = window.location.search.substring(1);
+    var sURLVariables = sPageURL.split('&');
+    for (var i = 0; i < sURLVariables.length; i++) 
+    {
+        var sParameterName = sURLVariables[i].split('=');
+        if (sParameterName[0] == sParam) 
+        {
+            return sParameterName[1];
+        }
+    }
+}​
+
+var userId = GetURLParameter('user_id');
+var giverId = GetURLParameter('giver_id');
+var couponId = GetURLParameter('coupon_id');
+
+document.getElementById("giver_id").innerHTML = giverId.toString();
+document.getElementById("user_id").innerHTML = userId.toString();
+document.getElementById("coupon_id").innerHTML = couponId.toString();
+
+console.log(giverId);
+console.log(userId);
+console.log(couponId);
+
+</script>
 
 <h1>Add Coupon </h1>
 <h2>In order to see a coupon you have to add one first</h2>
@@ -12,6 +42,9 @@
   <input type="text" name="description"><br>
   Photo:<br>
   <input type="file" name="photo" accept="image/*">
+  <input type="hidden" name="giver_id" id="giver_id">
+  <input type="hidden" name="user_id" id="user_id">
+  <input type="hidden" name="coupon_id" id="coupon_id">
   <br>
   <input type="submit" value="Add Coupon">
 </form>

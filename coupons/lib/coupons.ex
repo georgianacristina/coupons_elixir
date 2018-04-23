@@ -32,6 +32,8 @@ defmodule CouponsList.Page do
     import Plug.Conn
 
     def render(conn, controller) do
+      conn = assign(conn, :current_user, conn.assigns.current_user)
+      user_id =  conn.assigns.current_user.id
         header_html = "
         <!DOCTYPE html>
         <html>
@@ -50,13 +52,17 @@ defmodule CouponsList.Page do
         "</br><strong>ID:</strong> " <> Kernel.inspect(n.id) <>
         "</br><strong>Name:</strong> " <> Kernel.inspect(n.name) <>
         "</br><strong>Description:</strong> " <> Kernel.inspect(n.description) <> 
-        "</br><button onclick=\"window.location.href='/addcoupon/" <>  Kernel.inspect(n.giver_id) <> "'\">Get this coupon</button>" <> "<hr>"
+        "</br><button onclick=\"window.location.href='/addcoupon?giver_id=" <>  Kernel.inspect(n.giver_id) 
+              <> "&user_id=" <> Kernel.inspect(user_id) <> "&coupon_id=" 
+              <> Kernel.inspect(n.id)  <> "'\">Get this coupon</button>" <> "<hr>"
         
         html = Enum.join([header_html, x], " ")
         html = Enum.join([html, footer_html], " ")
+
         conn
         |> put_resp_content_type("text/html")
         |> send_resp(200,  html)
+
     end
 end
 
@@ -75,7 +81,7 @@ defmodule Login.Page do
 		password = conn.params["password"] 
 		user = Ecto.Query.from(p in Coupons.User, where: p.email == ^email,  where: p.password == ^password) |> Coupons.Repo.one
 		if !!user do
-
+      conn = assign(conn, :current_user, user)
 		[controller] = ["coupons"]
 	    CouponsList.Page.render(conn, controller)
 		
@@ -108,7 +114,9 @@ defmodule Register.Page do
 		user = %Coupons.User{email: email, password: password, first_name: firstName, last_name: lastName}
 		case Coupons.Repo.insert(user) do
 		  {:ok, user}       ->
-		  	send_resp(conn, 200, "Succesfully inserted.")
+		  	conn = assign(conn, :current_user, user)
+        [controller] = ["coupons"]
+      CouponsList.Page.render(conn, controller)
 		  {:error, user} ->
 		  	send_resp(conn, 200, "Something went wrong.")
 		end
@@ -124,6 +132,8 @@ defmodule CouponInsert.Page do
 	  end
 
     def render(conn, controller) do
+
+      IO.puts conn.assigns.current_user.id
        	conn = parse(conn)
 		name = conn.params["name"]
 		description = conn.params["description"]
