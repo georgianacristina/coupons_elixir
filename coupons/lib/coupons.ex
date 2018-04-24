@@ -32,7 +32,6 @@ defmodule CouponsList.Page do
     import Plug.Conn
 
     def render(conn, controller) do
-      path_info = conn.path_info
         if conn.assigns != %{} do
         conn = assign(conn, :current_user, conn.assigns.current_user)
         user_id =  conn.assigns.current_user.id
@@ -55,9 +54,9 @@ defmodule CouponsList.Page do
         </html>
         "
         x = for n <- Coupons.UserCoupon |> Coupons.Repo.all, do:
-        "</br><strong>ID:</strong> " <> Kernel.inspect(n.id) <>
         "</br><strong>Name:</strong> " <> Kernel.inspect(n.name) <>
         "</br><strong>Description:</strong> " <> Kernel.inspect(n.description) <> 
+        "</br><strong>Image:</strong><img src=" <> Kernel.inspect(n.photo) <> ">" <>
         "</br><button onclick=\"window.location.href='/addcoupon?giver_id=" <>  Kernel.inspect(n.giver_id) 
               <> "&user_id=" <> Kernel.inspect(user_id) <> "&coupon_id=" 
               <> Kernel.inspect(n.id)  <> "'\">Get this coupon</button>" <> "<hr>"
